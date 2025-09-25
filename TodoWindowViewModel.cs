@@ -38,8 +38,13 @@ namespace DoListApp
             TodoListView.Clear();
             var items = GetAllTodoItemsFromDatabase();
             foreach (var item in items)
+            {
+                changeUTCtoJST(item);
                 TodoListView.Add(item);
+            }
         }
+
+
         // ORマッパー使わない場合
         //private List<TodoItem> GetAllTodoItemsFromDatabase()
         //{
@@ -96,7 +101,10 @@ namespace DoListApp
             }
             TodoListView.Clear();
             foreach (var item in filterdItem)
+            {
+                changeUTCtoJST(item);
                 TodoListView.Add(item);
+            }
         }
 
         public void Delete_Click(int id)
@@ -110,6 +118,19 @@ namespace DoListApp
                     db.SaveChanges();
                 }
             }
+        }
+
+        public TodoItem changeUTCtoJST(TodoItem item)
+        {
+            //UTCの文字列をDateTimeに変換
+            DateTime utc = DateTime.Parse(item.DueDate, null, System.Globalization.DateTimeStyles.AdjustToUniversal);
+            // JSTに変換
+            TimeZoneInfo jstZone = TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
+            DateTime jst = TimeZoneInfo.ConvertTimeFromUtc(utc, jstZone);
+            // 表示用文字列に
+            item.DueDate = jst.ToString("yyyy-MM-dd");
+
+            return item;
         }
     }
 }

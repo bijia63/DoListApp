@@ -13,8 +13,10 @@ namespace DoListApp
         public int Id { get; set; }
         public string Task { get; set; }
         public string DueDate { get; set; }
-        public string Status { get; set; }
-        public string Description { get; set; }
+        public string? Status { get; set; }
+        public string? Description { get; set; }
+        public string? CompleteDate { get; set; }
+
     }
 
     public class TodoContext : DbContext
@@ -25,3 +27,4 @@ namespace DoListApp
             => options.UseSqlite("Data Source=todo.db");
     }
 }
+

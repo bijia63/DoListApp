@@ -39,7 +39,7 @@ namespace DoListApp
         {
             if (TodoDataGrid.SelectedItem is TodoItem item)
             {
-                var editWindow = new EditTodoWindow(item.Id, item.Task, item.DueDate, item.Description, item.Status);
+                var editWindow = new EditTodoWindow(item.Id);
 
                 if (editWindow.ShowDialog() == true)
                 {

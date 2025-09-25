@@ -21,9 +21,11 @@ namespace DoListApp
     /// </summary>
     public partial class AddTodoWindow : Window
     {
+        public bool isInitializing = true;
         public AddTodoWindow()
         {
             InitializeComponent();
+            isInitializing = false;
         }
 
         //ORマッパー使わない場合
@@ -46,13 +48,15 @@ namespace DoListApp
 
         private void Register_Click(object sender, RoutedEventArgs e)
         {
-            // 未完了を入れる必要がある
+            DateTime jst = DueDatePicker.SelectedDate.Value;
+            var utcDueDate = TimeZoneInfo.ConvertTimeToUtc(jst, TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time"));
+
             var newItem = new TodoItem
             {
-            Task = TaskNameTextBox.Text,
-            DueDate = DueDatePicker.SelectedDate?.ToString("yyyy-MM-dd"),
-            Status = "未完了",
-            Description = DetailTextBox.Text
+                Task = TaskNameTextBox.Text,
+                DueDate = utcDueDate.ToString("yyyy-MM-ddTHH:mm:ssZ"), // 例: "2025-09-25T03:00:00Z",
+                Status = "未完了",
+                Description = DetailTextBox.Text
             };
 
             using (var db = new TodoContext())
@@ -74,6 +78,18 @@ namespace DoListApp
         private void Back_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void DueDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                DateTime selectedDate = DueDatePicker.SelectedDate.Value;
+                if (selectedDate < DateTime.Now.Date)
+                {
+                    MessageBox.Show("過去日を選択しています", "警告", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
         }
     }
 }
