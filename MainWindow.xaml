@@ -6,7 +6,89 @@
         xmlns:local="clr-namespace:DoListApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="10,10,10,10">
+        <!-- 上部のボタン。新規登録：左寄せ ステータスラジオボタン：右寄せ -->
+        <Grid Margin="10,10,10,0" VerticalAlignment="Top" Height="40">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Content="新規登録" Width="100" Height="30" Click="AddTodo_Click" HorizontalAlignment="Left" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <RadioButton x:Name="AllRadioButton" Content="すべて" IsChecked="True" Margin="10,0" Checked="FilterRadioButton_Checked" />
+                <RadioButton x:Name="IncompleteRadioButton" Content="未完了" Margin="10,0" Checked="FilterRadioButton_Checked" />
+                <RadioButton x:Name="CompleteRadioButton" Content="完了" Margin="10,0" Checked="FilterRadioButton_Checked" />
+            </StackPanel>
+        </Grid>
 
+        <!-- 画面中央 -->
+        <DataGrid x:Name="TodoDataGrid"
+                  AutoGenerateColumns="False"
+                  Margin="10,60,10,60"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  ItemsSource="{Binding TodoListView}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" />
+                <DataGridTextColumn Header="タスク" Binding="{Binding Task}" Width="*" />
+                <DataGridTemplateColumn Width="150">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="期限"/>
+                            <Button Content="⇅" Width="24" Height="20" Margin="2,0,0,0"
+                            Click="SortDueDate_Click" />
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DueDate}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="100">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="ステータス"/>
+                            <Button Content="⇅" Width="24" Height="20" Margin="2,0,0,0"
+                            Click="SortStatus_Click"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Status}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="編集" Width="40">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="EditTodo_Click" ToolTip="編集" Background="Gray">
+                                <Image Source="pack://application:,,,/DoListApp;component/Resources/pencil.png" Width="16" Height="16"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="削除" Width="40"  >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="DeleteTodo_Click" ToolTip="削除" Background="Gray" >
+                                <Image Source="pack://application:,,,/DoListApp;component/Resources/trash.png" Width="16"
+                                Height="16"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <!-- 画面下部 ページネーション -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="bottom" Margin="0,0,0,10">
+            <Button Content="&lt;" Width="40" Margin="2" Click="PrevPage_Click"/>
+            <TextBlock x:Name="PageInfoTextBlock" VerticalAlignment="Center" Margin="5,0"/>
+            <Button Content=">" Width="40" Margin="2" Click="NextPage_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

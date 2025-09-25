@@ -16,9 +16,73 @@ namespace DoListApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        private TodoWindowViewModel TodoVM;
         public MainWindow()
         {
             InitializeComponent();
+            TodoVM = new TodoWindowViewModel();
+            this.DataContext = TodoVM;
+
+        }
+
+        private void AddTodo_Click(object sender, RoutedEventArgs e)
+        {
+            var addWindow = new AddTodoWindow();
+            if (addWindow.ShowDialog() == true)
+            {
+                TodoVM.LoadFromDatabase();
+                MessageBox.Show("登録しました", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void EditTodo_Click(object sender, RoutedEventArgs e)
+        {
+            if (TodoDataGrid.SelectedItem is TodoItem item)
+            {
+                var editWindow = new EditTodoWindow(item.Id, item.Task, item.DueDate, item.Description, item.Status);
+
+                if (editWindow.ShowDialog() == true)
+                {
+                    TodoVM.LoadFromDatabase();
+                    MessageBox.Show("更新しました", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+
+        }
+        private void DeleteTodo_Click(object sender, RoutedEventArgs e)
+        {
+            if (TodoDataGrid.SelectedItem is TodoItem item)
+            {
+                TodoVM.Delete_Click(item.Id);
+
+                TodoVM.LoadFromDatabase();
+                MessageBox.Show("削除しました", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        private void SortDueDate_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SortStatus_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PrevPage_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void NextPage_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void FilterRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (TodoVM == null) return;
+            var radio = (RadioButton)sender;
+            String selectedRadio = radio.Content.ToString();
+            TodoVM.FilterRadioButtonSort(selectedRadio);
         }
     }
 }
