@@ -1,11 +1,13 @@
-﻿<Window x:Class="DoListApp.MainWindow"
+﻿<mah:MetroWindow 
+        x:Class="DoListApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DoListApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        Title="MainWindow" Height="540" Width="850">
     <Grid Margin="10,10,10,10">
         <!-- 上部のボタン。新規登録：左寄せ ステータスラジオボタン：右寄せ -->
         <Grid Margin="10,10,10,0" VerticalAlignment="Top" Height="40">
@@ -27,6 +29,11 @@
                   Margin="10,60,10,60"
                   IsReadOnly="True"
                   CanUserAddRows="False"
+                  GridLinesVisibility="All"
+                  HorizontalGridLinesBrush="DarkGray"
+                  VerticalGridLinesBrush="DarkGray"
+                  BorderBrush="Gray"
+                  BorderThickness="1"
                   ItemsSource="{Binding PageItems}"
                   HeadersVisibility="Column">
             <DataGrid.Columns>
@@ -47,22 +54,22 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="ステータス" Binding="{Binding Status}" Width="60" />
+                <DataGridTextColumn Header="ステータス" Binding="{Binding Status}" Width="70" />
 
-                <DataGridTemplateColumn Header="編集" Width="40">
+                <DataGridTemplateColumn Header="編集" Width="60">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Click="EditTodo_Click" ToolTip="編集" Background="Gray">
+                            <Button Click="EditTodo_Click" ToolTip="編集" Background="MediumSeaGreen">
                                 <Image Source="pack://application:,,,/DoListApp;component/Resources/pencil.png" Width="16" Height="16"/>
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="削除" Width="40"  >
+                <DataGridTemplateColumn Header="削除" Width="60"  >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Click="DeleteTodo_Click" ToolTip="削除" Background="Gray" >
+                            <Button Click="DeleteTodo_Click" ToolTip="削除" Background="MediumSeaGreen" >
                                 <Image Source="pack://application:,,,/DoListApp;component/Resources/trash.png" Width="16"
                                 Height="16"/>
                             </Button>
@@ -82,4 +89,4 @@
         </StackPanel>
 
     </Grid>
-</Window>
+</mah:MetroWindow>

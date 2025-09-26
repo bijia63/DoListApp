@@ -1,10 +1,12 @@
-﻿<Window x:Class="DoListApp.EditTodoWindow"
+﻿<mah:MetroWindow  
+        x:Class="DoListApp.EditTodoWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DoListApp"
         mc:Ignorable="d"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         Title="EditTodoWindow" Height="400" Width="550">
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -43,4 +45,4 @@
             <Button Content="戻る" Width="80" Margin="10,0" Click="Back_Click" />
         </StackPanel>
     </Grid>
-</Window>
+</mah:MetroWindow>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using MahApps.Metro.Controls;
+using Microsoft.Data.Sqlite;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace DoListApp
     /// <summary>
     /// AddTodoWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class AddTodoWindow : Window
+    public partial class AddTodoWindow : MetroWindow
     {
         public bool isInitializing = true;
         public AddTodoWindow()

@@ -4,6 +4,14 @@
              xmlns:local="clr-namespace:DoListApp"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!-- MahApps.Metro resource dictionaries -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- accent and theme setting -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Green.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
