@@ -61,21 +61,17 @@ namespace DoListApp
         }
         private void SortDueDate_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void SortStatus_Click(object sender, RoutedEventArgs e)
-        {
-
+            if (TodoVM == null) return;
+            TodoVM.SortDueDate();
         }
 
         private void PrevPage_Click(object sender, RoutedEventArgs e)
         {
-
+            TodoVM.PreviousPage();
         }
         private void NextPage_Click(object sender, RoutedEventArgs e)
         {
-
+            TodoVM.NextPage();
         }
         private void FilterRadioButton_Checked(object sender, RoutedEventArgs e)
         {

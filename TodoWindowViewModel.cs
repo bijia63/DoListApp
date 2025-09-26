@@ -1,17 +1,78 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using System.Runtime.CompilerServices;
 
 namespace DoListApp
 {
-    internal class TodoWindowViewModel
+    internal class TodoWindowViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<TodoItem> TodoListView { get; set; }
+        public ObservableCollection<TodoItem> AllItems { get; set; } = new();
+        public ObservableCollection<TodoItem> PageItems { get; set; } = new();
         public const string DbPath = "todo.db";
+        public bool isDueDateAscending = true;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private int _currentPage = 1;
+        public int CurrentPage
+        {
+            get => _currentPage;
+            set
+            {
+                if (_currentPage != value)
+                {
+                    _currentPage = value;
+                    OnPropertyChanged();
+                    UpdatePagedItems();
+                    UpdateButtonStates();
+                    OnPropertyChanged(nameof(PageInfo));
+                }
+            }
+        }
+
+        private int _pageSize = 10;
+        public int PageSize
+        {
+            get => _pageSize;
+            set
+            {
+                if (_pageSize != value)
+                {
+                    _pageSize = value;
+                    OnPropertyChanged();
+                    UpdatePageInfo();
+                    UpdatePagedItems();
+                    OnPropertyChanged(nameof(PageInfo));
+                }
+            }
+        }
+
+        private int _totalPages = 1;
+        public int TotalPages
+        {
+            get => _totalPages;
+            set
+            {
+                if (_totalPages != value)
+                {
+                    _totalPages = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(PageInfo));
+                }
+            }
+        }
+
+        public string PageInfo => $"{CurrentPage} / {TotalPages}";
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public TodoWindowViewModel()
         {
-
-            TodoListView = new ObservableCollection<TodoItem>();
             InitializeDatabase();
             LoadFromDatabase();
         }
@@ -35,39 +96,18 @@ namespace DoListApp
 
         public void LoadFromDatabase()
         {
-            TodoListView.Clear();
+            AllItems.Clear();
             var items = GetAllTodoItemsFromDatabase();
             foreach (var item in items)
             {
                 changeUTCtoJST(item);
-                TodoListView.Add(item);
+                AllItems.Add(item);
             }
+            CurrentPage = 1;
+            UpdatePageInfo();
+            UpdatePagedItems();
+            UpdateButtonStates();
         }
-
-
-        // ORマッパー使わない場合
-        //private List<TodoItem> GetAllTodoItemsFromDatabase()
-        //{
-        //    var items = new List<TodoItem>();
-        //    using var connection = new SqliteConnection($"Data Source={DbPath}");
-        //    connection.Open();
-
-        //    var command = connection.CreateCommand();
-        //    command.CommandText = @"SELECT Id, Task, DueDate, Status, Description FROM Todo;";
-        //    using var reader = command.ExecuteReader();
-        //    while (reader.Read())
-        //    {
-        //        items.Add(new TodoItem
-        //        {
-        //            Id = reader.GetInt32(0),
-        //            Task = reader.GetString(1),
-        //            DueDate = reader.IsDBNull(2) ? null : reader.GetString(2),
-        //            Status = reader.IsDBNull(3) ? "未完了" : reader.GetString(3),
-        //            Description = reader.IsDBNull(4) ? string.Empty : reader.GetString(4)
-        //        });
-        //    }
-        //    return items;
-        //}
 
         private List<TodoItem> GetAllTodoItemsFromDatabase()
         {
@@ -81,30 +121,35 @@ namespace DoListApp
 
         public void FilterRadioButtonSort(string filter)
         {
-            var TempListView = GetAllTodoItemsFromDatabase();
+            var tempList = GetAllTodoItemsFromDatabase();
 
-            IEnumerable<TodoItem> filterdItem = TempListView;
+            IEnumerable<TodoItem> filtered = tempList;
             switch (filter)
             {
                 case "すべて":
-                    filterdItem = TempListView;
+                    filtered = tempList;
                     break;
                 case "未完了":
-                    filterdItem = TempListView.Where(x => x.Status == "未完了");
+                    filtered = tempList.Where(x => x.Status == "未完了");
                     break;
                 case "完了":
-                    filterdItem = TempListView.Where(x => x.Status == "完了");
+                    filtered = tempList.Where(x => x.Status == "完了");
                     break;
                 default:
                     MessageBox.Show("不明なフィルターです", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
             }
-            TodoListView.Clear();
-            foreach (var item in filterdItem)
+
+            AllItems.Clear();
+            foreach (var item in filtered)
             {
                 changeUTCtoJST(item);
-                TodoListView.Add(item);
+                AllItems.Add(item);
             }
+            CurrentPage = 1;
+            UpdatePageInfo();
+            UpdatePagedItems();
+            UpdateButtonStates();
         }
 
         public void Delete_Click(int id)
@@ -118,19 +163,77 @@ namespace DoListApp
                     db.SaveChanges();
                 }
             }
+            LoadFromDatabase();
         }
 
         public TodoItem changeUTCtoJST(TodoItem item)
         {
-            //UTCの文字列をDateTimeに変換
             DateTime utc = DateTime.Parse(item.DueDate, null, System.Globalization.DateTimeStyles.AdjustToUniversal);
-            // JSTに変換
             TimeZoneInfo jstZone = TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
             DateTime jst = TimeZoneInfo.ConvertTimeFromUtc(utc, jstZone);
-            // 表示用文字列に
             item.DueDate = jst.ToString("yyyy-MM-dd");
-
             return item;
+        }
+
+        public void SortDueDate()
+        {
+            var sorted = isDueDateAscending
+                ? AllItems.OrderBy(x => x.DueDate).ToList()
+                : AllItems.OrderByDescending(x => x.DueDate).ToList();
+
+            AllItems.Clear();
+            foreach (var item in sorted)
+            {
+                AllItems.Add(item);
+            }
+            isDueDateAscending = !isDueDateAscending;
+            UpdatePagedItems();
+        }
+
+        private void UpdatePagedItems()
+        {
+            PageItems.Clear();
+            var paged = AllItems.Skip((CurrentPage - 1) * PageSize).Take(PageSize);
+            foreach (var item in paged)
+            {
+                PageItems.Add(item);
+            }
+            OnPropertyChanged(nameof(PageItems));
+            OnPropertyChanged(nameof(PageInfo));
+        }
+
+        public void NextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        public void PreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
+        }
+
+        private void UpdatePageInfo()
+        {
+            TotalPages = (int)Math.Ceiling((double)AllItems.Count / PageSize);
+            if (TotalPages == 0) TotalPages = 1;
+            if (CurrentPage > TotalPages) CurrentPage = TotalPages;
+            if (CurrentPage < 1) CurrentPage = 1;
+            OnPropertyChanged(nameof(PageInfo));
+        }
+
+        public bool CanGoPrevious => CurrentPage > 1;
+        public bool CanGoNext => CurrentPage < TotalPages;
+
+        private void UpdateButtonStates()
+        {
+            OnPropertyChanged(nameof(CanGoPrevious));
+            OnPropertyChanged(nameof(CanGoNext));
         }
     }
 }

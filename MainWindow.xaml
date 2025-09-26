@@ -27,16 +27,17 @@
                   Margin="10,60,10,60"
                   IsReadOnly="True"
                   CanUserAddRows="False"
-                  ItemsSource="{Binding TodoListView}">
+                  ItemsSource="{Binding PageItems}"
+                  HeadersVisibility="Column">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" />
                 <DataGridTextColumn Header="タスク" Binding="{Binding Task}" Width="*" />
-                <DataGridTemplateColumn Width="150">
+                <DataGridTemplateColumn Width="100">
                     <DataGridTemplateColumn.Header>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="期限"/>
+                            <TextBlock Text="締切日"/>
                             <Button Content="⇅" Width="24" Height="20" Margin="2,0,0,0"
-                            Click="SortDueDate_Click" />
+                            Click="SortDueDate_Click" x:Name="SortDueDate"/>
                         </StackPanel>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
@@ -46,20 +47,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="100">
-                    <DataGridTemplateColumn.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="ステータス"/>
-                            <Button Content="⇅" Width="24" Height="20" Margin="2,0,0,0"
-                            Click="SortStatus_Click"/>
-                        </StackPanel>
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Status}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="ステータス" Binding="{Binding Status}" Width="60" />
 
                 <DataGridTemplateColumn Header="編集" Width="40">
                     <DataGridTemplateColumn.CellTemplate>
@@ -86,9 +74,12 @@
         
         <!-- 画面下部 ページネーション -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="bottom" Margin="0,0,0,10">
-            <Button Content="&lt;" Width="40" Margin="2" Click="PrevPage_Click"/>
-            <TextBlock x:Name="PageInfoTextBlock" VerticalAlignment="Center" Margin="5,0"/>
-            <Button Content=">" Width="40" Margin="2" Click="NextPage_Click"/>
+            <Button Content="前へ" IsEnabled="{Binding CanGoPrevious}" Click="PrevPage_Click"/>
+            <TextBlock Text="{Binding CurrentPage}" />
+            <TextBlock Text="/" />
+            <TextBlock Text="{Binding TotalPages}" />
+            <Button Content="次へ" IsEnabled="{Binding CanGoNext}" Click="NextPage_Click"/>
         </StackPanel>
+
     </Grid>
 </Window>
